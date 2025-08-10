@@ -126,6 +126,24 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
     onComplete();
   };
 
+  const handleQuitStudy = () => {
+    // タイマー状態を完全にリセット
+    setIsRunning(false);
+    setIsOnBreak(false);
+    setShowBreakDialog(false);
+    setShowExtensionDialog(false);
+    setCurrentSubjectIndex(0);
+    setCompletedSubjects([]);
+    setBreakTimeRemaining(0);
+    setExtensionTime('');
+    setIsFreeStudy(false);
+    setFreeStudyTime(0);
+    setTimeRemaining(0);
+    
+    // 学習プラン作成画面に戻る
+    onComplete();
+  };
+
   // 初期化処理
   useEffect(() => {
     if (studyPlan && studyPlan.length > 0) {
@@ -422,7 +440,7 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
       {/* 学習をやめるボタン（学習プランがある場合のみ表示） */}
       <div className="flex justify-end mb-4">
         <button
-          onClick={onComplete}
+          onClick={handleQuitStudy}
           className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2 text-sm"
         >
           <X className="w-4 h-4" />
