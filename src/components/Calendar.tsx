@@ -5,7 +5,7 @@ export interface Event {
   id: string;
   title: string;
   date: string;
-  type: 'test' | 'assignment' | 'other';
+  type: 'test' | 'assignment' | 'juku' | 'other';
   subject?: string;
 }
 
@@ -18,12 +18,14 @@ interface CalendarProps {
 const eventTypeColors = {
   test: 'bg-red-100 text-red-800 border-red-200',
   assignment: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  juku: 'bg-green-100 text-green-800 border-green-200',
   other: 'bg-blue-100 text-blue-800 border-blue-200',
 };
 
 const eventTypeLabels = {
   test: 'テスト',
   assignment: '課題',
+  juku: '塾',
   other: 'その他',
 };
 
@@ -115,6 +117,7 @@ export function Calendar({ events, onAddEvent, onRemoveEvent }: CalendarProps) {
                 <option value="">種類を選択してください</option>
                 <option value="test">テスト</option>
                 <option value="assignment">課題</option>
+                <option value="juku">塾</option>
                 <option value="other">その他</option>
               </select>
             </div>
