@@ -151,23 +151,10 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
     }
   }, [studyPlan]);
 
-  // 学習プランがない場合の早期リターン
+  // 学習プランがない場合の表示
   if (!studyPlan || studyPlan.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-lg p-8">
-        {/* 学習をやめるボタン（学習プランがある場合のみ表示） */}
-        {studyPlan && studyPlan.length > 0 && (
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={onComplete}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2 text-sm"
-            >
-              <X className="w-4 h-4" />
-              学習をやめる
-            </button>
-          </div>
-        )}
-
         {/* フリースタディ時間設定ダイアログ */}
         {showFreeStudyDialog && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -216,6 +203,16 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
         {/* フリースタディモード */}
         {isFreeStudy ? (
           <div className="text-center mb-8">
+            {/* 学習をやめるボタン */}
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={handleQuitStudy}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2 text-sm"
+              >
+                <X className="w-4 h-4" />
+                学習をやめる
+              </button>
+            </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">フリースタディ</h2>
             <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-6 mb-6">
               <h3 className="text-xl font-bold text-purple-800 mb-2">
