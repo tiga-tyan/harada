@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Clock, Calendar, TrendingUp, Award, Target, Plus, X, PieChart } from 'lucide-react';
+import { BookOpen, Clock, Calendar, TrendingUp, Award, Target, Plus, X, PieChart, Users, Trophy, Medal, Crown } from 'lucide-react';
 
 export interface StudySession {
   id: string;
@@ -18,6 +18,7 @@ interface StudyRecordProps {
 
 export function StudyRecord({ sessions, onAddSession, onRemoveSession }: StudyRecordProps) {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showRanking, setShowRanking] = useState(false);
   const [newSession, setNewSession] = useState({
     subject: '',
     duration: '',
@@ -25,6 +26,29 @@ export function StudyRecord({ sessions, onAddSession, onRemoveSession }: StudyRe
     type: 'free' as const,
     notes: '',
   });
+
+  // 学校内ランキングのダミーデータ（実際のアプリでは外部APIから取得）
+  const schoolRanking = [
+    { name: 'あなた', totalTime: totalStudyTime, rank: 1, isCurrentUser: true },
+    { name: '田中さん', totalTime: 1250, rank: 2, isCurrentUser: false },
+    { name: '佐藤さん', totalTime: 1180, rank: 3, isCurrentUser: false },
+    { name: '山田さん', totalTime: 1050, rank: 4, isCurrentUser: false },
+    { name: '鈴木さん', totalTime: 980, rank: 5, isCurrentUser: false },
+    { name: '高橋さん', totalTime: 920, rank: 6, isCurrentUser: false },
+    { name: '伊藤さん', totalTime: 850, rank: 7, isCurrentUser: false },
+    { name: '渡辺さん', totalTime: 780, rank: 8, isCurrentUser: false },
+    { name: '中村さん', totalTime: 720, rank: 9, isCurrentUser: false },
+    { name: '小林さん', totalTime: 650, rank: 10, isCurrentUser: false },
+  ].sort((a, b) => b.totalTime - a.totalTime).map((user, index) => ({ ...user, rank: index + 1 }));
+
+  const currentUserRank = schoolRanking.find(user => user.isCurrentUser)?.rank || 1;
+
+  const getRankIcon = (rank: number) => {
+    if (rank === 1) return <Crown className="w-5 h-5 text-yellow-500" />;
+    if (rank === 2) return <Medal className="w-5 h-5 text-gray-400" />;
+    if (rank === 3) return <Trophy className="w-5 h-5 text-orange-600" />;
+    return <span className="w-5 h-5 flex items-center justify-center text-sm font-bold text-gray-600">{rank}</span>;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,8 +191,97 @@ export function StudyRecord({ sessions, onAddSession, onRemoveSession }: StudyRe
   };
   return (
     <div className="space-y-6">
+      {/* 学校内ランキングダイアログ */}
+      {showRanking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <Users className="w-6 h-6 text-blue-600" />
+                学校内勉強時間ランキング
+              </h3>
+              <button
+                onClick={() => setShowRanking(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-1">#{currentUserRank}</div>
+                <div className="text-lg text-gray-700">あなたの順位</div>
+                <div className="text-sm text-gray-600 mt-2">
+                  総学習時間: {formatTime(totalStudyTime)}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {schoolRanking.map((user, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center justify-between p-4 rounded-lg border ${
+                    user.isCurrentUser 
+                      ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-300' 
+                      : 'bg-gray-50 border-gray-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-8 h-8">
+                      {getRankIcon(user.rank)}
+                    </div>
+                    <div>
+                      <div className={`font-medium ${user.isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
+                        {user.name}
+                        {user.isCurrentUser && <span className="text-blue-600 ml-2">(あなた)</span>}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {formatTime(user.totalTime)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-lg font-bold ${
+                      user.rank === 1 ? 'text-yellow-600' :
+                      user.rank === 2 ? 'text-gray-500' :
+                      user.rank === 3 ? 'text-orange-600' : 'text-gray-600'
+                    }`}>
+                      #{user.rank}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <h4 className="font-medium text-yellow-800 mb-2 flex items-center gap-2">
+                <Trophy className="w-4 h-4" />
+                💡 ランキングアップのコツ
+              </h4>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>• 毎日少しずつでも継続して学習しましょう</li>
+                <li>• 学習記録をこまめに追加して正確な時間を記録</li>
+                <li>• 友達と一緒に勉強して切磋琢磨しましょう</li>
+                <li>• 質の高い学習を心がけて効率を上げましょう</li>
+              </ul>
+            </div>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setShowRanking(false)}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 統計サマリー */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-2">
             <Clock className="w-6 h-6 text-blue-600" />
@@ -206,6 +319,25 @@ export function StudyRecord({ sessions, onAddSession, onRemoveSession }: StudyRe
           <div className="text-sm text-purple-700">
             {sessions.length}セッション
           </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Users className="w-6 h-6 text-orange-600" />
+            <h3 className="font-semibold text-orange-800">学校内順位</h3>
+          </div>
+          <div className="text-3xl font-bold text-orange-900 mb-1">
+            #{currentUserRank}
+          </div>
+          <div className="text-sm text-orange-700 mb-2">
+            10人中
+          </div>
+          <button
+            onClick={() => setShowRanking(true)}
+            className="text-xs px-3 py-1 bg-orange-200 text-orange-800 rounded-full hover:bg-orange-300 transition-colors duration-200"
+          >
+            詳細を見る
+          </button>
         </div>
       </div>
 
