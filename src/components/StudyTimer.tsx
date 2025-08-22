@@ -40,9 +40,12 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
     if (duration > 0) {
       setIsFreeStudy(true);
       setTimeRemaining(duration * 60); // 分を秒に変換
-      setIsRunning(true);
       setShowFreeStudyDialog(false);
       setFreeStudyDuration('');
+      // 少し遅延させてからタイマーを開始
+      setTimeout(() => {
+        setIsRunning(true);
+      }, 100);
     }
   };
 
@@ -367,7 +370,7 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (isFreeStudy && isRunning && timeRemaining > 0) {
+    if (isFreeStudy && isRunning) {
       interval = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
@@ -381,7 +384,7 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
     }
 
     return () => clearInterval(interval);
-  }, [isFreeStudy, isRunning, timeRemaining]);
+  }, [isFreeStudy, isRunning]);
 
   const progressPercentage = (elapsedTime / totalTime) * 100;
 
