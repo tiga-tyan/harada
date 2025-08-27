@@ -367,14 +367,12 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (isRunning) {
+    if (isRunning && isFreeStudy) {
       interval = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
-            if (isFreeStudy) {
-              setIsRunning(false);
-              setIsFreeStudy(false);
-            }
+            setIsRunning(false);
+            setIsFreeStudy(false);
             return 0;
           }
           return prev - 1;
