@@ -367,12 +367,14 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (isRunning && isFreeStudy) {
+    if (isRunning) {
       interval = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
-            setIsRunning(false);
-            setIsFreeStudy(false);
+            if (isFreeStudy) {
+              setIsRunning(false);
+              setIsFreeStudy(false);
+            }
             return 0;
           }
           return prev - 1;
@@ -381,7 +383,7 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, isFreeStudy, timeRemaining]);
+  }, [isRunning, isFreeStudy]);
 
   const progressPercentage = (elapsedTime / totalTime) * 100;
 
