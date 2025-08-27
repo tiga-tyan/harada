@@ -40,9 +40,12 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
     if (duration > 0) {
       setIsFreeStudy(true);
       setTimeRemaining(duration * 60); // 分を秒に変換
-      setIsRunning(true);
       setShowFreeStudyDialog(false);
       setFreeStudyDuration('');
+      // 状態更新後にタイマーを開始
+      setTimeout(() => {
+        setIsRunning(true);
+      }, 100);
     }
   };
 
