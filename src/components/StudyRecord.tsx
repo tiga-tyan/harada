@@ -27,6 +27,19 @@ export function StudyRecord({ sessions, onAddSession, onRemoveSession }: StudyRe
     notes: '',
   });
 
+  // 統計計算
+  const today = new Date().toISOString().split('T')[0];
+  const thisWeekStart = new Date();
+  thisWeekStart.setDate(thisWeekStart.getDate() - thisWeekStart.getDay());
+  const thisWeekStartStr = thisWeekStart.toISOString().split('T')[0];
+
+  const todaySessions = sessions.filter(s => s.date === today);
+  const thisWeekSessions = sessions.filter(s => s.date >= thisWeekStartStr);
+  
+  const todayTotal = todaySessions.reduce((sum, s) => sum + s.duration, 0);
+  const thisWeekTotal = thisWeekSessions.reduce((sum, s) => sum + s.duration, 0);
+  const totalStudyTime = sessions.reduce((sum, s) => sum + s.duration, 0);
+
   // 学校内ランキングのダミーデータ（実際のアプリでは外部APIから取得）
   const schoolRanking = [
     { name: 'あなた', totalTime: totalStudyTime, rank: 1, isCurrentUser: true },
@@ -67,19 +80,6 @@ export function StudyRecord({ sessions, onAddSession, onRemoveSession }: StudyRe
       setShowAddForm(false);
     }
   };
-
-  // 統計計算
-  const today = new Date().toISOString().split('T')[0];
-  const thisWeekStart = new Date();
-  thisWeekStart.setDate(thisWeekStart.getDate() - thisWeekStart.getDay());
-  const thisWeekStartStr = thisWeekStart.toISOString().split('T')[0];
-
-  const todaySessions = sessions.filter(s => s.date === today);
-  const thisWeekSessions = sessions.filter(s => s.date >= thisWeekStartStr);
-  
-  const todayTotal = todaySessions.reduce((sum, s) => sum + s.duration, 0);
-  const thisWeekTotal = thisWeekSessions.reduce((sum, s) => sum + s.duration, 0);
-  const totalStudyTime = sessions.reduce((sum, s) => sum + s.duration, 0);
 
   // 教科別統計
   const subjectStats = sessions.reduce((acc, session) => {
