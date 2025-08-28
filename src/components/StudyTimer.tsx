@@ -188,6 +188,13 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
 
   // 学習プランがない場合の表示
   if (!studyPlan || studyPlan.length === 0) {
+    const timeOptions = [
+      { value: 5, label: '5分' },
+      { value: 15, label: '15分' },
+      { value: 30, label: '30分' },
+      { value: 60, label: '60分（ポモドーロ）' },
+    ];
+
     return (
       <div className="bg-white rounded-2xl shadow-lg p-8">
         {/* フリースタディ時間設定ダイアログ */}
@@ -200,25 +207,32 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
                   フリースタディ
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  何分間勉強しますか？
+                  学習時間を選択してください
                 </p>
-                <div className="mb-6">
-                  <input
-                    type="number"
-                    min="1"
-                    max="480"
-                    value={freeStudyDuration}
-                    onChange={(e) => setFreeStudyDuration(e.target.value)}
-                    placeholder="例：30"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg text-center"
-                    autoFocus
-                  />
-                  <p className="text-sm text-gray-500 mt-2">1〜480分で入力してください</p>
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  {timeOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSelectedDuration(option.value)}
+                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                        selectedDuration === option.value
+                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                      }`}
+                    >
+                      <div className="text-lg font-semibold">{option.label}</div>
+                      {option.value === 60 && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          25分勉強 + 5分休憩 × 2
+                        </div>
+                      )}
+                    </button>
+                  ))}
                 </div>
                 <div className="flex gap-3">
                   <button
                     onClick={handleConfirmFreeStudy}
-                    disabled={!freeStudyDuration || parseInt(freeStudyDuration) <= 0}
+                    disabled={selectedDuration === 0}
                     className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     開始
@@ -330,8 +344,8 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
               <h4 className="font-medium text-gray-800 mb-2">💡 タイマー機能について</h4>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• 学習プラン: 教科ごとに時間を設定して効率的に学習</li>
-                <li>• フリースタディ: 自由な時間設定でマイペースに学習</li>
-                <li>• 休憩機能: 集中力を保つための適切な休憩時間</li>
+                <li>• フリースタディ: 5分〜60分の時間設定でマイペースに学習</li>
+                <li>• ポモドーロ: 60分選択時は25分勉強+5分休憩を2セット</li>
                 <li>• 進捗管理: 学習の進み具合を視覚的に確認</li>
               </ul>
             </div>
@@ -455,228 +469,6 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
       setTimeRemaining(studyPlan[0].time * 60);
     }
   }, [studyPlan]);
-
-  // 学習プランがない場合の表示
-  if (!studyPlan || studyPlan.length === 0) {
-    const timeOptions = [
-      { value: 5, label: '5分' },
-      { value: 15, label: '15分' },
-      { value: 30, label: '30分' },
-      { value: 60, label: '60分（ポモドーロ）' },
-    ];
-
-    return (
-      <div className="bg-white rounded-2xl shadow-lg p-8">
-        {/* フリースタディ時間設定ダイアログ */}
-        {showFreeStudyDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <div className="text-center">
-                <Timer className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  フリースタディ
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  学習時間を選択してください
-                </p>
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  {timeOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => setSelectedDuration(option.value)}
-                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                        selectedDuration === option.value
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
-                      }`}
-                    >
-                      <div className="text-lg font-semibold">{option.label}</div>
-                      {option.value === 60 && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          25分勉強 + 5分休憩 × 2
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleConfirmFreeStudy}
-                    disabled={selectedDuration === 0}
-                    className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  >
-                    開始
-                  </button>
-                  <button
-                    onClick={handleCancelFreeStudy}
-                    className="flex-1 px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200"
-                  >
-                    キャンセル
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* フリースタディモード */}
-        {(isFreeStudy || isPomodoro) ? (
-          <div className="text-center mb-8">
-            {/* 学習をやめるボタン */}
-            <div className="flex justify-end mb-4">
-              <button
-                onClick={handleQuitStudy}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2 text-sm"
-              >
-                <X className="w-4 h-4" />
-                学習をやめる
-              </button>
-            </div>
-            
-            {isPomodoro ? (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">ポモドーロタイマー</h2>
-                <div className={`rounded-xl p-6 mb-6 ${
-                  pomodoroPhase === 'study' ? 'bg-gradient-to-r from-blue-100 to-purple-100' : 'bg-gradient-to-r from-green-100 to-emerald-100'
-                }`}>
-                  <h3 className={`text-xl font-bold mb-2 ${
-                    pomodoroPhase === 'study' ? 'text-blue-800' : 'text-green-800'
-                  }`}>
-                    {pomodoroPhase === 'study' ? '勉強' : '休憩'}
-                    {pomodoroPhase === 'study' && ` (${pomodoroSession}/2)`}
-                  </h3>
-                  <div className="text-6xl font-mono font-bold text-gray-800 mb-4">
-                    {formatTime(timeRemaining)}
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {pomodoroPhase === 'study' ? '集中して学習しましょう' : 'リラックスして休憩しましょう'}
-                  </p>
-                </div>
-                
-                {/* 進捗表示 */}
-                <div className="mb-6">
-                  <div className="flex justify-center gap-2 mb-2">
-                    <div className={`w-4 h-4 rounded-full ${
-                      pomodoroSession >= 1 && pomodoroPhase === 'study' ? 'bg-blue-500' : 
-                      pomodoroSession > 1 ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
-                    <div className={`w-4 h-4 rounded-full ${
-                      pomodoroSession >= 1 && pomodoroPhase === 'break' ? 'bg-green-500' : 
-                      pomodoroSession > 1 ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
-                    <div className={`w-4 h-4 rounded-full ${
-                      pomodoroSession >= 2 && pomodoroPhase === 'study' ? 'bg-blue-500' : 
-                      pomodoroSession > 2 ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
-                    <div className={`w-4 h-4 rounded-full ${
-                      pomodoroSession >= 2 && pomodoroPhase === 'break' ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    勉強25分 → 休憩5分 → 勉強25分 → 休憩5分
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">フリースタディ</h2>
-                <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-6 mb-6">
-                  <h3 className="text-xl font-bold text-purple-800 mb-2">
-                    自由学習中
-                  </h3>
-                  <div className="text-6xl font-mono font-bold text-gray-800 mb-4">
-                    {formatTime(timeRemaining)}
-                  </div>
-                  <p className="text-sm text-purple-700">
-                    残り時間: {Math.floor(timeRemaining / 60)}分
-                  </p>
-                </div>
-              </div>
-            )}
-            
-            <div className="flex justify-center gap-4 mb-6">
-              {!isRunning ? (
-                <button
-                  onClick={handleStart}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
-                >
-                  <Play className="w-5 h-5" />
-                  開始
-                </button>
-              ) : (
-                <button
-                  onClick={handlePause}
-                  className="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 flex items-center gap-2"
-                >
-                  <Pause className="w-5 h-5" />
-                  一時停止
-                </button>
-              )}
-              
-              <button
-                onClick={() => {
-                  setIsFreeStudy(false);
-                  setIsPomodoro(false);
-                  setIsRunning(false);
-                  setTimeRemaining(0);
-                  setPomodoroPhase('study');
-                  setPomodoroSession(1);
-                }}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center gap-2"
-              >
-                <X className="w-5 h-5" />
-                終了
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* 初期画面 */
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8">学習タイマー</h2>
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <div className="text-4xl mb-4">📚</div>
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">学習プラン</h3>
-                <p className="text-sm text-blue-600 mb-4">
-                  効率的な学習計画を立てて、集中して勉強しましょう
-                </p>
-                <button
-                  onClick={onComplete}
-                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                >
-                  学習プランを作成
-                </button>
-              </div>
-              
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-                <div className="text-4xl mb-4">⏱️</div>
-                <h3 className="text-lg font-semibold text-purple-800 mb-2">フリースタディ</h3>
-                <p className="text-sm text-purple-600 mb-4">
-                  自由な時間で好きなペースで学習できます
-                </p>
-                <button
-                  onClick={handleStartFreeStudy}
-                  className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200"
-                >
-                  フリースタディ開始
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-medium text-gray-800 mb-2">💡 タイマー機能について</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• 学習プラン: 教科ごとに時間を設定して効率的に学習</li>
-                <li>• フリースタディ: 5分〜60分の時間設定でマイペースに学習</li>
-                <li>• ポモドーロ: 60分選択時は25分勉強+5分休憩を2セット</li>
-                <li>• 進捗管理: 学習の進み具合を視覚的に確認</li>
-              </ul>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
 
   // フリースタディのストップウォッチ
   useEffect(() => {
