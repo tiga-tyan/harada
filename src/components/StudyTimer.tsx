@@ -32,6 +32,7 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
   const [pomodoroPhase, setPomodoroPhase] = useState<'study' | 'break'>('study');
   const [pomodoroSession, setPomodoroSession] = useState(1);
   const [totalPomodoroDuration, setTotalPomodoroDuration] = useState(0);
+  const [freeStudyDuration, setFreeStudyDuration] = useState('');
 
   // イベントハンドラー関数を最初に定義
   const handleStartFreeStudy = () => {
@@ -62,11 +63,24 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
         setIsRunning(true);
       }, 100);
     }
+    
+    if (freeStudyDuration && parseInt(freeStudyDuration) > 0) {
+      const duration = parseInt(freeStudyDuration);
+      setIsFreeStudy(true);
+      setTimeRemaining(duration * 60);
+      setShowFreeStudyDialog(false);
+      setFreeStudyDuration('');
+      // 状態更新後にタイマーを開始
+      setTimeout(() => {
+        setIsRunning(true);
+      }, 100);
+    }
   };
 
   const handleCancelFreeStudy = () => {
     setShowFreeStudyDialog(false);
     setSelectedDuration(0);
+    setFreeStudyDuration('');
   };
 
   const moveToNextSubject = () => {
@@ -663,6 +677,17 @@ export function StudyTimer({ studyPlan, onComplete }: StudyTimerProps) {
       </div>
     );
   }
+
+  // フリースタディのストップウォッチ
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isRunning && isFreeStudy) {
+      interval = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            setIsRunning(false);
+            setIsFreeStudy(false);
             return 0;
           }
           return prev - 1;
